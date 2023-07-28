@@ -15,13 +15,18 @@ var comments = [];
 
 //user - 250k
 //category - 100k
-//post - 500k
+//post - 500k, with 4 categories, 2 comments
 //comments - 1M
 
-const userCount = 1;
+const userCount = 0;
+const categoryCount = 1;
 
 for (let index = 0; index < userCount; index++) {
   createUser();
+}
+
+for (let index = 0; index < categoryCount; index++) {
+  createCategory();
 }
 
 //user
@@ -33,8 +38,7 @@ function createUser() {
     email: faker.internet.email(),
     password: faker.internet.password(),
     role: "user",
-    table: "users",
-    submit: true,
+    table: "users"
   };
 
   axios
@@ -51,16 +55,16 @@ function createUser() {
 
 // category
 function createCategory() {
-  const category = {
-    title: faker.lorem.lines(),
+  const data = {
+    title: faker.lorem.words(2),
     body: faker.lorem.words(350),
     table: "category",
   };
 
   axios
-    .post(`/content`, { category }, customConfig)
+    .post(`/content`, { data }, customConfig)
     .then(function (response) {
-      categories.push(category);
+      categories.push(data);
       console.log(response.status);
     })
     .catch(function (error) {
@@ -70,7 +74,7 @@ function createCategory() {
 
 // post
 function createPost(userId) {
-  const post = {
+  const data = {
     title: faker.lorem.lines(),
     body: faker.lorem.words(1000),
     userId: userId,
@@ -78,9 +82,9 @@ function createPost(userId) {
   };
 
   axios
-    .post(`/content`, { post }, customConfig)
+    .post(`/content`, { data }, customConfig)
     .then(function (response) {
-      posts.push(post);
+      posts.push(data);
       console.log(response.status);
     })
     .catch(function (error) {
@@ -90,7 +94,7 @@ function createPost(userId) {
 
 // comment
 function createComment(userId, postId) {
-  const comment = {
+  const data = {
     body: faker.lorem.words(200),
     userId: userId,
     postId: postId,
@@ -98,9 +102,9 @@ function createComment(userId, postId) {
   };
 
   axios
-    .post(`/content`, { comment }, customConfig)
+    .post(`/content`, { data }, customConfig)
     .then(function (response) {
-      comments.push(comments);
+      comments.push(data);
       console.log(response.status);
     })
     .catch(function (error) {
