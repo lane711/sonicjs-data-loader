@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   proxy: false,
 });
 
-axiosInstance.defaults.baseURL = "http://127.0.0.1:8788/v1";
+axiosInstance.defaults.baseURL = "http://localhost:4321/api/v1";
 // axiosInstance.defaults.baseURL = "https://27a58f99.sonicjs-emq.pages.dev/v1";
 // axiosInstance.defaults.baseURL = "https://demo.sonicjs.com/v1";
 
@@ -26,11 +26,11 @@ var comments = [];
 //post - 500k, with 4 categories, 2 comments
 //comments - 1M
 
-const userCount = 3;
-const categoryCount = 2;
-const postCount = 2;
-const commentCount = 3;
-const categoryToPost = 0;
+const userCount = 30;
+const categoryCount = 1;
+const postCount = 5;
+const commentCount = 15;
+const categoryToPost = 2;
 
 var userCountCreated = 0;
 
@@ -61,19 +61,23 @@ async function createUser() {
     .post(`/users`, { data }, customConfig)
     .then(async function (response) {
       users.push(data);
-      console.log("user", response.status, response.data.id);
-      const userId = response.data.id;
-      await createCategory(userId);
+      console.log("user", response.status, response.data.data.id);
+      const userId = response.data.data.id;
+      if (userId) {
+        for (let index = 0; index < categoryCount; index++) {
+          await createCategory(userId);
+        }
+      }
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error?.data?.message);
     });
 }
 
 // category
 async function createCategory(userId) {
   const data = {
-    title: faker.lorem.words(2),
+    title: toTitleCase(faker.lorem.words(2)),
     body: faker.lorem.words(350),
   };
 
@@ -81,21 +85,21 @@ async function createCategory(userId) {
     .post(`/categories`, { data }, customConfig)
     .then(async function (response) {
       categories.push(data);
-      console.log("category", response.status, response.data.id);
-      const categoryId = response.data.id;
+      console.log("category", response.status, response.data.data.id);
+      const categoryId = response.data.data.id;
       for (let index = 0; index < postCount; index++) {
         await createPost(userId, categoryId);
       }
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error?.data?.message);
     });
 }
 
 // post
 async function createPost(userId, categoryId) {
   const data = {
-    title: faker.lorem.words(5),
+    title: toTitleCase(faker.lorem.words(5)),
     body: faker.lorem.words(1000),
     userId: userId,
   };
@@ -104,15 +108,18 @@ async function createPost(userId, categoryId) {
     .post(`/posts`, { data }, customConfig)
     .then(async function (response) {
       posts.push(data);
-      console.log("post", response.status, response.data.id);
-      const postId = response.data.id;
+      console.log("post", response.status, response.data.data.id);
+      const postId = response.data.data.id;
+
       for (let index = 0; index < commentCount; index++) {
         await createComment(userId, postId);
       }
-      await createCategoryToPost(postId, categoryId);
+      for (let index = 0; index < categoryToPost; index++) {
+        await createCategoryToPost(postId, categoryId);
+      }
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error?.data?.message);
     });
 }
 
@@ -128,11 +135,11 @@ async function createComment(userId, postId) {
   axiosInstance
     .post(`/comments`, { data }, customConfig)
     .then(function (response) {
-      console.log("comment", response.status, response.data.id);
+      console.log("comment", response.status, response.data.data.id);
       console.log(response.status);
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error?.data?.message);
     });
 }
 
@@ -147,11 +154,11 @@ async function createCategoryToPost(postId, categoryId) {
   axiosInstance
     .post(`/categories-to-posts`, { data }, customConfig)
     .then(function (response) {
-      console.log("createCategoryToPost", response.status, response.data.id);
+      console.log("createCategoryToPost", response.status, response.data.data.id);
       console.log(response.status);
     })
     .catch(function (error) {
-      console.log(error);
+      console.log(error?.data?.message);
     });
 }
 
@@ -160,6 +167,13 @@ function sleep(miliseconds) {
   var currentTime = new Date().getTime();
 
   while (currentTime + miliseconds >= new Date().getTime()) {}
+}
+
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+  );
 }
 
 let interval = setInterval(start, 5000);
