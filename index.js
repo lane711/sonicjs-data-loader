@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.defaults.baseURL = "http://localhost:4321/api/v1";
-// axiosInstance.defaults.baseURL = "https://27a58f99.sonicjs-emq.pages.dev/v1";
+// axiosInstance.defaults.baseURL = "https://demo.sonicjs.com/api/v1";
 // axiosInstance.defaults.baseURL = "https://demo.sonicjs.com/v1";
 
 customConfig = {
@@ -26,10 +26,10 @@ var comments = [];
 //post - 500k, with 4 categories, 2 comments
 //comments - 1M
 
-const userCount = 30;
-const categoryCount = 1;
-const postCount = 5;
-const commentCount = 15;
+const userCount = 10;
+const categoryCount = 10;
+const postCount = 20;
+const commentCount = 12;
 const categoryToPost = 2;
 
 var userCountCreated = 0;
