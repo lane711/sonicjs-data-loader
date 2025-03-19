@@ -42,34 +42,39 @@ async function migrateData() {
     const loginResponseDestination = await axios.post(
       `${destinationApiUrl}/auth/login`,
       {
-        data: {
-          email: "demo@demo.com",
-          password: "sonicjs!",
-        },
-        headers: {
-          "Content-Type": "application/json",
-        },
+        email: "demo@demo.com",
+        password: "sonicjs!",
+      },
+      {
+        "Content-Type": "application/json",
       }
     );
-    // console.log('loginResponse:', loginResponse.data);
-
+    // console.log('loginResponseDestination:', loginResponseDestination.data);
     const tokenDestination = loginResponseDestination.data.bearer;
-    console.log("Logged in successfully:", tokenDestination);
-    return;
+    console.log("Logged in successfully destination:", tokenDestination);
+
+    // return;
+
     // Post data to destination API
     for (const item of data) {
       console.log("item:", item);
       delete item.id;
-      const postResponse = await axios.post(`${destinationApiUrl}/${table}`, {
-        data: item,
-        headers: {
-          Authorization: `Bearer ${tokenDestination}`,
+
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + tokenDestination,
+      };
+      const postResponse = await axios.post(
+        `${destinationApiUrl}/${table}`,
+        {
+          data: item,
         },
-      });
-      console.log("Data item migrated successfully:", postResponse.data);
+        { headers: headers }
+      );
+    //   console.log("Data item migrated successfully:", postResponse.data);
     }
 
-    console.log("Data migrated successfully:", postResponse.data);
+    // console.log("Data migrated successfully:", postResponse.data);
   } catch (error) {
     console.error("Error migrating data:", error);
   }
